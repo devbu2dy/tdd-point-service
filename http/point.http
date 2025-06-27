@@ -9,3 +9,6 @@ PATCH localhost:8080/point/1/use
 Content-Type: application/json
 
 5000
+
+### 포인트 조회
+GET localhost:8080/point/1
