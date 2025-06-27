@@ -17,6 +17,7 @@ public class PointController {
     private final ChargePointUseCase chargePointUseCase;
     private final UsePointUseCase usePointUseCase;
     private final GetPointUseCase getPointUseCase;
+    private final GetPointHistoryUseCase getPointHistoryUseCase;
 
     /**
      * TODO - 특정 유저의 포인트를 조회하는 기능을 작성해주세요.
@@ -36,7 +37,7 @@ public class PointController {
     public List<PointHistory> history(
             @PathVariable long id
     ) {
-        return List.of();
+        return getPointHistoryUseCase.selectAllByUserId(id);
     }
 
     /**

@@ -12,3 +12,6 @@ Content-Type: application/json
 
 ### 포인트 조회
 GET localhost:8080/point/1
+
+### 포인트 내역 조회
+GET localhost:8080/point/1/histories
