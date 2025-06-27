@@ -134,4 +134,72 @@ class UserPointTest {
                 Arguments.of(4_990_000L, 10_000L, 5_000_000L) // 최대 잔고 도달
         );
     }
+
+    @Nested
+    class 포인트_사용_유효성_검사_실패 {
+
+        @Test
+        void 포인트를_사용할_때_음수_또는_0이면_IllegalArgumentException을_반환한다() {
+            // given
+            sut =  UserPoint.empty(1L);
+
+            Long amount = 0L;
+            Long updateMillis = System.currentTimeMillis();
+
+            // when & then
+            assertThatThrownBy(() -> sut.use(amount, updateMillis))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("사용 포인트는 0보다 커야 합니다.");
+        }
+
+        @Test
+        void 포인트를_사용할_때_최소_사용_금액_미만이면_IllegalArgumentException을_반환한다() {
+            // given
+            sut =  UserPoint.empty(1L);
+
+            Long amount = 4999L;
+            Long updateMillis = System.currentTimeMillis();
+
+            // when & then
+            assertThatThrownBy(() -> sut.use(amount, updateMillis))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("포인트는 최소 " + MIN_USE_AMOUNT.formattedValue() + " 포인트 이상부터 사용할 수 있습니다.");
+        }
+
+        @Test
+        void 포인트를_사용할_때_잔고가_부족하면_IllegalArgumentException을_반환한다() {
+            // given
+            Long balance = 4999L;
+            sut =  new UserPoint(1L, balance, System.currentTimeMillis());
+
+            Long amount = 5000L;
+            Long updateMillis = System.currentTimeMillis();
+
+            // when & then
+            assertThatThrownBy(() -> sut.use(amount, updateMillis))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("잔고가 부족합니다. (현재 잔고: %,d 포인트, 사용 요청: %,d 포인트)", balance, amount);
+        }
+    }
+
+    @Nested
+    class 포인트_사용_성공 {
+
+        @Test
+        void 포인트를_사용할_때_잔고가_5000포인트이고_사용_포인트가_5000포인트이면_잔고는_0포인트가_된다() {
+            // given
+            Long balance = 5000L;
+            sut =  new UserPoint(1L, balance, System.currentTimeMillis());
+
+            Long amount = 5000L;
+            Long updateMillis = System.currentTimeMillis();
+
+            // when
+            UserPoint result = sut.use(amount, updateMillis);
+
+            // then
+            assertThat(result.point()).isEqualTo(balance - amount);
+            assertThat(result.updateMillis()).isEqualTo(updateMillis);
+        }
+    }
 }

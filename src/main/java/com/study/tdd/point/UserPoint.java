@@ -43,4 +43,27 @@ public record UserPoint(
             );
         }
     }
+
+    public UserPoint use(Long amount, Long updateMillis) {
+        verifyUseAmount(amount, point);
+        return new UserPoint(id, point - amount, updateMillis);
+    }
+
+    private void verifyUseAmount(Long amount, Long balance) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("사용 포인트는 0보다 커야 합니다.");
+        }
+
+        if (amount < MIN_USE_AMOUNT.value()) {
+            throw new IllegalArgumentException(
+                    "포인트는 최소 " + MIN_USE_AMOUNT.formattedValue() + " 포인트 이상부터 사용할 수 있습니다."
+            );
+        }
+
+        if (amount > balance) {
+            throw new IllegalArgumentException(
+                    String.format("잔고가 부족합니다. (현재 잔고: %,d 포인트, 사용 요청: %,d 포인트)", balance, amount)
+            );
+        }
+    }
 }
