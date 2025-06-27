@@ -1,0 +1,5 @@
+### 포인트 충전
+PATCH localhost:8080/point/1/charge
+Content-Type: application/json
+
+10000
