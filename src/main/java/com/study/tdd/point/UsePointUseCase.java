@@ -15,9 +15,12 @@ public class UsePointUseCase {
     private final PointHistoryTable pointHistoryTable;
 
     public UserPoint use(Long userId, Long amount, Long updateMillis) {
-        UserPoint userPoint = userPointTable.selectById(userId);
-        UserPoint usedUserPoint = userPoint.use(amount, updateMillis);
-        userPointTable.insertOrUpdate(userId, usedUserPoint.point());
+        UserPoint usedUserPoint;
+        synchronized (this) {
+            UserPoint userPoint = userPointTable.selectById(userId);
+            usedUserPoint = userPoint.use(amount, updateMillis);
+            userPointTable.insertOrUpdate(userId, usedUserPoint.point());
+        }
         pointHistoryTable.insert(userId, amount, USE, updateMillis);
         return usedUserPoint;
     }
